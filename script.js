@@ -2,10 +2,8 @@ const myLibrary = [];
 
 const showButton = document.getElementById("showDialog");
 const newBook = document.getElementById("newBook");
-const tempName = newBook.querySelector("name");
-const tempAuthor = newBook.querySelector("author");
-const tempPages = newBook.querySelector("pages");
 const confirmBtn = newBook.querySelector("#confirmBtn");
+const removeBtn = document.querySelector(".remove");
 
 function Book(name, author, pages) {
   // the constructor...
@@ -24,23 +22,6 @@ function Book(name, author, pages) {
   
 }
 
-function addCard(cardContainer, book){
-    const bookDiv = document.createElement("div");
-    const removeButton = document.createElement("button");
-
-    bookDiv.classList.add("card");
-    bookDiv.textContent = book.info();
-    if(book.read){
-        bookDiv.style.boxShadow = "-5px 5px #82b74b";
-    }
-
-    removeButton.textContent = "Remove";
-    removeButton.classList.add("remove");
-    bookDiv.appendChild(removeButton);
-
-    cardContainer.appendChild(bookDiv);
-}
-
 function addBookToLibrary(Book) {
   // take params, create a book then store it in the array
     myLibrary.unshift(Book);
@@ -49,12 +30,61 @@ function addBookToLibrary(Book) {
 function showLibrary(){
     const cardContainer = document.querySelector(".card-container");
     cardContainer.replaceChildren();
-    for(let i = 0; i < myLibrary.length; i++){
-        if(myLibrary[i].name !== null){
-            //console.log(myLibrary[i].info());
-            addCard(cardContainer, myLibrary[i]);
+    
+    myLibrary.forEach((book) => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        const name = document.createElement("h2");
+        name.classList.add("name");
+        name.textContent = book.name;
+
+        const author = document.createElement("p");
+        author.classList.add("author");
+        author.textContent = `by ${book.author}` ;
+
+        const page = document.createElement("p");
+        page.classList.add("pages");
+        page.textContent = `${book.pages} pages`;
+
+        if(book.read){
+            card.style.boxShadow = "-5px 5px #82b74b";
         }
-    }
+
+        const removeBtn = document.createElement("button");
+        removeBtn.classList.add("remove");
+        removeBtn.textContent = "Remove";
+        removeBtn.addEventListener("click", () => {
+            const index = myLibrary.findIndex(b => b.id === book.id);
+            if(index !== -1){
+                myLibrary.splice(index, 1);
+                showLibrary();
+            }
+        });
+
+        const isReadBtn = document.createElement("button");
+        isReadBtn.classList.add("isRead");
+        isReadBtn.textContent = "Not read yet";
+        if(book.read){
+            card.style.boxShadow = "-5px 5px #82b74b";
+            isReadBtn.textContent = "Read already";
+        }
+        isReadBtn.addEventListener("click", () =>{
+            book.read = true;
+            card.style.boxShadow = "-5px 5px #82b74b";
+            isReadBtn.textContent = "Read already";
+            showLibrary();
+        });
+
+        card.appendChild(name);
+        card.appendChild(author);
+        card.appendChild(page);
+        card.appendChild(removeBtn);
+        card.appendChild(isReadBtn);
+
+    
+        cardContainer.appendChild(card);
+    })
 }
 
 let bookOne = new Book("book 1", "me", 234);
@@ -77,14 +107,37 @@ showButton.addEventListener("click", () => {
 
 newBook.addEventListener("close", (e) => {
     e.preventDefault();
-    dialog.close();
+    newBook.close();
 });
 
-newBook.addEventListener("click", (event) => {
-  event.preventDefault(); // We don't want to submit this fake form
-  console.log("selected!");
-  let newBook = new Book(tempName, tempAuthor, tempPages);
-  addBookToLibrary(newBook);
-  showLibrary();
-  dialog.close();
+confirmBtn.addEventListener("click", (event) => {
+    event.preventDefault(); // We don't want to submit this fake form
+
+    const nameInput = newBook.querySelector("#name");
+    const authorInput = newBook.querySelector("#author");
+    const pageInput = newBook.querySelector("#page");
+
+    const nameValue = nameInput.value;
+    const authorValue = authorInput.value;
+    const pageValue = pageInput.value;
+
+    //console.log(nameValue);
+
+    if(nameValue && authorValue && pageValue){
+        const tempBook = new Book(nameValue,authorValue,pageValue);
+        //console.log(tempBook);
+        addBookToLibrary(tempBook);
+        showLibrary();
+
+        //disable dialog box and clear the form
+        newBook.close();
+        document.getElementById("name").value = "";
+        document.getElementById("author").value = "";
+        document.getElementById("page").value = "";
+    }
+    else{
+        alert("Please fill the book data");
+    }
 });
+
+
