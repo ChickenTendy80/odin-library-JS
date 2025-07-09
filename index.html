@@ -10,7 +10,21 @@
 <body>
     <h1 class="header">Welcome to your library!</h1>
     <div class="button">
-        <button>Add New Book</button>
+        <dialog id="newBook">
+            <form>
+                <label for="name">Book name:</label><br>
+                <input type="text" id="name"><br>
+                <label for="author">Author name:</label><br>
+                <input type="text" id="author"><br>
+                <label for="page">Number of pages:</label><br>
+                <input type="number" id="page">
+                <div>
+                    <button value="cancel" formmethod="dialog">Cancel</button>
+                    <button id="confirmBtn" value="default">Confirm</button>
+                </div>
+            </form>
+        </dialog>
+        <button id="showDialog">Add New Book</button>
     </div>
     <div class="card-container">
         <!--Use html to add cards here-->
